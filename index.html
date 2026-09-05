@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof Of Work | \$POW Automation Terminal</title>
+    <style>
+        :root {
+            --bg-color: #060913;
+            --card-bg: #0f1626;
+            --accent: #ff9f43;
+            --accent-glow: rgba(255, 159, 67, 0.25);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #f43f5e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
+        .terminal-box { background: var(--card-bg); width: 100%; max-width: 580px; padding: 2.5rem; border-radius: 16px; border: 1px solid #1e293b; box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        .terminal-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+        h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+        h1 span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+        .input-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .address-input { width: 100%; background: #090d16; border: 1px solid #334155; padding: 1.1rem; border-radius: 8px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; font-family: monospace; }
+        .address-input:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+        .cta-btn { background: var(--accent); color: #000; border: none; padding: 1.1rem; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cta-btn:hover { background: #ffb366; box-shadow: 0 0 20px var(--accent-glow); }
+        .cta-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
+        .progress-track { width: 100%; background: #1e293b; height: 8px; border-radius: 4px; margin-top: 1.5rem; display: none; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 8px var(--accent); transition: width 0.1s linear; }
+        .status-banner { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: left; border: 1px solid transparent; }
+        .status-banner.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: var(--success); }
+        .status-banner.error { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3); color: var(--error); }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-box">
+        <h1>Proof Of <span>Work</span></h1>
+        <p>Input your public EVM address. Secure mining allocations will execute instantly without wallet connection variables.</p>
+        
+        <div class="input-group">
+            <label for="address">Robinhood Chain Destination Address</label>
+            <input type="text" id="address" class="address-input" placeholder="0x..." autocomplete="off">
+        </div>
+
+        <button class="cta-btn" id="mine-btn" disabled>Execute Computing Task</button>
+
+        <div class="progress-track" id="progress-container">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
+
+        <div id="status-display" class="status-banner"></div>
+    </div>
+
+    <script>
+        const addressInput = document.getElementById('address');
+        const mineBtn = document.getElementById('mine-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const statusDisplay = document.getElementById('status-display');
+
+        // PRODUCTION SETTING: When deployed, replace with your backend hosting domain url
+        const BACKEND_API = "https://pow-backend-1.onrender.com";
+
+        addressInput.addEventListener('input', () => {
+            mineBtn.disabled = !addressInput.value.trim().startsWith('0x') || addressInput.value.trim().length !== 42;
+        });
+
+        mineBtn.addEventListener('click', async () => {
+            mineBtn.disabled = true;
+            addressInput.disabled = true;
+            progressContainer.style.display = 'block';
+            statusDisplay.style.display = 'none';
+
+            let fillPercentage = 0;
+            const miningSimulation = setInterval(() => {
+                if (fillPercentage >= 100) {
+                    clearInterval(miningSimulation);
+                    submitWorkToBackend();
+                } else {
+                    fillPercentage += 4;
+                    progressBar.style.width = fillPercentage + '%';
+                }
+            }, 80);
+        });
+
+        async function submitWorkToBackend() {
+            try {
+                const response = await fetch(`${BACKEND_API}/api/claim-rewards`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        walletAddress: addressInput.value.trim(),
+                        workToken: "VALID_COMPUTATION_TOKEN_HASH_99"
+                    })
+                });
+                
+                const payload = await response.json();
+                statusDisplay.style.display = 'block';
+                
+                if (payload.success) {
+                    statusDisplay.className = "status-banner success";
+                    statusDisplay.innerHTML = `🏁 <b>Payout Sent Successfully!</b><br>Amount: 10 $POW<br>Tx Hash: <small style="word-break:break-all;">${payload.txHash}</small>`;
+                } else {
+                    statusDisplay.className = "status-banner error";
+                    statusDisplay.innerText = `❌ Error: ${payload.error}`;
+                }
+            } catch (err) {
+                statusDisplay.style.display = 'block';
+                statusDisplay.className = "status-banner error";
+                statusDisplay.innerText = "❌ Security Exception: Payout infrastructure server is unreachable.";
+            } finally {
+                mineBtn.disabled = false;
+                addressInput.disabled = false;
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+            }
+        }
+    </script>
+</body>
+</html>
