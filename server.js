@@ -21,41 +21,11 @@ console.log(`🔒 Vault Check: Simulation Mode Live`);
 
 const trackingCooldownRegistry = new Map();
 
-// Configuration Limits
-const REWARD_AMOUNT = "0.00002"; // Strict limit per work done (in WBTC format)
-const COOLDOWN_TIME = 24 * 60 * 60 * 1000; // 24-hour limit cooldown per wallet
+app.post('/api/claim-rewards', async (req, res) => {
+    const { walletAddress, workToken } = req.body;
 
-const userCooldowns = new Map();
-
-app.post("/api/claim-reward", async (req, res) => {
-    const { walletAddress, twitterProofLink } = req.body;
-
-    // 1. Condition: Verify Twitter proof link is provided
-    if (!twitterProofLink || !twitterProofLink.includes("twitter.com") && !twitterProofLink.includes("x.com")) {
-        return res.status(400).json({ error: "Invalid Proof. You must provide a valid X/Twitter raid link." });
-    }
-
-    // 2. Condition: Enforce strict limit per wallet (Anti-spam cooldown)
-    const currentTime = Date.now();
-    if (userCooldowns.has(walletAddress)) {
-        const lastPayoutTime = userCooldowns.get(walletAddress);
-        if (currentTime - lastPayoutTime < COOLDOWN_TIME) {
-            const timeLeft = Math.ceil((COOLDOWN_TIME - (currentTime - lastPayoutTime)) / (60 * 60 * 1000));
-            return res.status(429).json({ error: `Limit reached. You can claim again in ${timeLeft} hours.` });
-        }
-    }
-
-    // 3. Process the fixed payout amount if conditions pass
-    console.log(`[RAID VALIDATED] Worker ${walletAddress} submitted link: ${twitterProofLink}`);
-    
-    // Your existing ethers.js transaction code goes here, hardcoded to use REWARD_AMOUNT...
-    
-    // Save timestamp to enforce the limit
-    userCooldowns.set(walletAddress, currentTime);
-    
-    res.json({ success: true, message: `${REWARD_AMOUNT} WBTC distribution initiated.` });
-});
-
+    if (!walletAddress || !workToken) {
+        return res.status(400).json({ success: false, error: "Invalid payload parameters submitted." });
     }
 
     // 1. MASTER LOCKOUT SWITCH CHECK

@@ -66,9 +66,28 @@
         // PRODUCTION SETTING: When deployed, replace with your backend hosting domain url
         const BACKEND_API = "https://pow-backend-1.onrender.com";
 
-        addressInput.addEventListener('input', () => {
-            mineBtn.disabled = !addressInput.value.trim().startsWith('0x') || addressInput.value.trim().length !== 42;
-        });
+        <!-- STEP 1: TWITTER RAID INPUT FIELD -->
+<div class="input-group" style="margin-bottom: 20px;">
+    <label style="color: #00ffcc; font-weight: bold; display: block; margin-bottom: 8px;">
+        STEP 1: RAID THE TARGET X TWEET
+    </label>
+    <p style="margin: 5px 0 12px 0; font-size: 14px; color: #888;">
+        👉 <a href="https://x.com" target="_blank" style="color: #ff007f; text-decoration: underline;">CLICK HERE TO OPEN TWEET</a> 
+        Like, Retweet, and leave a comment.
+    </p>
+    <input type="text" id="twitterProof" placeholder="Paste your X/Twitter reply or quote link here as proof" 
+           style="width: 100%; padding: 12px; background: #111; color: #00ffcc; border: 1px solid #00ffcc; font-family: monospace; box-sizing: border-box;">
+</div>
+
+<!-- STEP 2: WALLET ADDRESS INPUT FIELD (This is your original box) -->
+<div class="input-group" style="margin-bottom: 20px;">
+    <label style="color: #00ffcc; font-weight: bold; display: block; margin-bottom: 8px;">
+        STEP 2: ENTER YOUR PAYOUT WALLET ADDRESS
+    </label>
+    <input type="text" id="walletInput" placeholder="0x..." 
+           style="width: 100%; padding: 12px; background: #111; color: #00ffcc; border: 1px solid #00ffcc; font-family: monospace; box-sizing: border-box;">
+</div>
+
 
         mineBtn.addEventListener('click', async () => {
             mineBtn.disabled = true;
@@ -120,6 +139,43 @@
                 progressBar.style.width = '0%';
             }
         }
-    </script>
-</body>
-</html>
+    // 1. Locate the button click handler function inside your <script> tags
+async function handleSubmit(event) {
+    event.preventDefault();
+
+    // 2. Grab values from BOTH input boxes on your page
+    const walletAddress = document.getElementById("walletInput").value.trim();
+    const twitterProofLink = document.getElementById("twitterProof").value.trim();
+
+    // Quick client-side check before sending to the server
+    if (!walletAddress || !twitterProofLink) {
+        alert("Error: Please provide both your wallet address and your X/Twitter proof link!");
+        return;
+    }
+
+    try {
+        // 3. Send BOTH values to your live Render backend API
+        const response = await fetch(`${BACKEND_API}/api/claim-reward`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                walletAddress: walletAddress, 
+                twitterProofLink: twitterProofLink 
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`Success! Payout initiated: ${data.message}`);
+        } else {
+            alert(`Error: ${data.error}`);
+        }
+    } catch (error) {
+        console.error("Network Error:", error);
+        alert("Failed to reach the distribution vault. Please try again later.");
+    }
+}
+
