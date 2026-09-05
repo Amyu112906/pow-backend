@@ -9,7 +9,7 @@ app.use(express.json());
 
 // 🎛️ ADMINISTRATIVE TOGGLE CONTROL SWITCHES
 const RUNTIME_STATE = {
-    PAYOUTS_ENABLED: false,      // 🟢 TRUE = Automated Payments Live | 🔴 FALSE = Dead Switch Lock
+    PAYOUTS_ENABLED: true,      // 🟢 TRUE = Automated Payments Live | 🔴 FALSE = Dead Switch Lock
     TOKEN_REWARD_VALUE: "10.0", // Flat ERC-20 token amount issued per computation claim
     ANTI_SPAM_COOLDOWN_MS: 3600000, // Strict 1-hour abuse protection rule per unique user address
 };
