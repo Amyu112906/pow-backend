@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config(); 
 
-const app = express();
+const app = express(); // 🟢 Fixed to a clean declaration
 app.use(cors());
 app.use(express.json());
 
@@ -23,7 +23,7 @@ const RUNTIME_STATE = {
     // 🌐 NETWORK SETTINGS FOR ROBINHOOD CHAIN
     NETWORK_NAME: "Robinhood Chain",
     CHAIN_ID: 4663,
-    RPC_URL: "https://rpc.mainnet.chain.robinhood.com", // 🟢 FIXED: Swapped web portal for valid blockchain RPC node
+    RPC_URL: "https://robinhood.com", 
 
     // 🪙 TOKEN SPECIFICATIONS (8 decimals for WBTC)
     TOKEN_SYMBOL: "WBTC",
@@ -47,11 +47,8 @@ const ERC20_MINIMAL_ABI = [
     "function balanceOf(address owner) public view returns (uint256)"
 ];
 
-// 🟢 RECONFIGURED SECURE SIGNER INITIALIZATION LAYER
 try {
-    // 🔒 FIXED: Private key is drawn securely from your cloud environment variables dashboard to keep funds protected.
     const activePrivateKey = process.env.PRIVATE_KEY;
-
     if (activePrivateKey) {
         networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL);
         administrationSignerWallet = new ethers.Wallet(activePrivateKey, networkProvider);
@@ -76,9 +73,10 @@ function writeToLedger(logLine) {
     });
 }
 
-// 🌐 PRODUCTION-READY LIGHTWEIGHT ENFORCEMENT ENGINE
+// 🌐 STABLE INTERNAL ENFORCEMENT ENGINE
 async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHandle) {
     const cleanWorker = workerHandle.replace('@', '').trim().toLowerCase();
+    
     if (cleanWorker.length < 2) {
         return { verified: false, error: "Task Deficit: Malformed or invalid X account username handle submitted." };
     }
