@@ -26,13 +26,8 @@ const RUNTIME_STATE = {
     TOKEN_DECIMALS: 8,
     USD_REWARD_LIMIT: 0.50,      
     
-    // 📊 GLOBAL MARKET PRICE TRACKERS
-    GLOBAL_MARKET: {
-        BTC: { price: 94250.00, change: "+3.45%" },
-        ETH: { price: 3120.50, change: "+1.88%" },
-        SOL: { price: 184.75, change: "-0.92%" },
-        RHD: { price: 0.85, change: "+12.40%" } 
-    }
+    // 📊 SPOT BASELINE FOR INTERNAL DISTRIBUTION CALCULATION
+    MOCK_BTC_PRICE_USD: 94250.00
 };
 
 const LEDGER_FILE_PATH = path.join(__dirname, 'payout_ledger.txt');
@@ -68,7 +63,7 @@ try {
 
 function calculateWbtcRewardAmount() {
     // Calculates strict $0.50 allocation split matching the 8 decimals precision of WBTC
-    const exactTokens = RUNTIME_STATE.USD_REWARD_LIMIT / RUNTIME_STATE.GLOBAL_MARKET.BTC.price;
+    const exactTokens = RUNTIME_STATE.USD_REWARD_LIMIT / RUNTIME_STATE.MOCK_BTC_PRICE_USD;
     return exactTokens.toFixed(RUNTIME_STATE.TOKEN_DECIMALS);
 }
 
@@ -78,19 +73,6 @@ function writeToLedger(logLine) {
         if (err) console.error("⚠️ Ledger System Error:", err);
     });
 }
-
-// REST ENDPOINT: Pulls broad market metrics and target calculation parameters
-app.get('/api/market-prices', (req, res) => {
-    res.json({
-        success: true,
-        marketData: RUNTIME_STATE.GLOBAL_MARKET,
-        rewardAllocation: {
-            rewardLimitUsd: RUNTIME_STATE.USD_REWARD_LIMIT,
-            calculatedReward: calculateWbtcRewardAmount(),
-            tokenSymbol: RUNTIME_STATE.TOKEN_SYMBOL
-        }
-    });
-});
 
 // REST ENDPOINT: Fetches cooldown timers and lifetime stats for users
 app.post('/api/check-balance', (req, res) => {
