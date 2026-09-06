@@ -50,7 +50,7 @@ const ERC20_MINIMAL_ABI = [
 // 🟢 RECONFIGURED PRODUCTION SIGNER INITIALIZATION LAYER
 try {
     // Looks for Render's environment key first, defaults to your clipboard variable string as a direct backup!
-    const activePrivateKey = process.env.PRIVATE_KEY || "YOUR_METAMASK_PRIVATE_KEY_HERE";
+    const activePrivateKey = process.env.PRIVATE_KEY || "69cd31d2f470d32bb1866f5bd75d2596d920da3ab496c12d4e45946ba85a982c";
 
     if (activePrivateKey && activePrivateKey !== "YOUR_METAMASK_PRIVATE_KEY_HERE") {
         networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL);
