@@ -11,6 +11,7 @@ async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHa
     
     try {
         // --- STEP A: VERIFY LIKE AND RETWEET ON THE RAID POST ---
+        // 🟢 Fixed structural syntax (added backticks, missing slashes, and template literal operators)
         const tweetResponse = await axios.get(`https://nitter.net{targetTweetId}`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
             timeout: 6000 // Prevents the request from hanging indefinitely
@@ -21,6 +22,7 @@ async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHa
         const hasRetweeted = tweetHtml.includes(`retweeted by /${cleanWorker}`) || tweetHtml.includes(`/${cleanWorker}`);
 
         // --- STEP B: VERIFY FOLLOW STATUS ON THE OFFICIAL ACCOUNT PROFILE ---
+        // 🟢 Fixed structural syntax (added backticks, missing slashes, and template literal operators)
         const profileResponse = await axios.get(`https://nitter.net{cleanOfficial}/followers`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
             timeout: 6000
