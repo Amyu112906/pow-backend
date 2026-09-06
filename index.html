@@ -54,14 +54,6 @@
         .portal-link-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(255, 159, 67, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 0.75rem 1.2rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; margin-bottom: 1rem; width: 100%; text-align: center; }
         .portal-link-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent-glow); }
 
-        .market-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; margin-bottom: 1.5rem; background: #090d16; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); text-align: left; }
-        .market-table th, .market-table td { padding: 1rem; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); }
-        .market-table th { background: rgba(255,255,255,0.02); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
-        .market-table td { font-family: monospace; color: #fff; }
-        .market-table td.asset-name { font-family: inherit; font-weight: 700; }
-        .crypto-up { color: var(--success) !important; }
-        .crypto-down { color: var(--error) !important; }
-
         .roadmap-timeline { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
         .roadmap-node { background: #090d16; border-left: 3px solid var(--accent); padding: 1rem; border-radius: 0 8px 8px 0; text-align: left; }
         .roadmap-node.done { border-left-color: var(--success); }
@@ -85,7 +77,6 @@
         
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchTab('rewards-tab', this)">💎 Rewards Center</button>
-            <button class="tab-btn" onclick="switchTab('market-tab', this); fetchLivePriceFeeds();">📊 Market Tracking</button>
             <button class="tab-btn" onclick="switchTab('roadmap-tab', this)">🗺️ Road Map</button>
             <button class="tab-btn" onclick="switchTab('twitter-tab', this)">🐦 Robinhood Updates</button>
         </div>
@@ -123,15 +114,25 @@
             </div>
         </div>
 
-        <!-- 📊 TAB 2: GENERAL CRYPTO MARKET TRACKING -->
-        <div id="market-tab" class="tab-content">
-            <p class="intro-text">Live index feeds tracking broad cryptocurrency performance asset variations.</p>
-            
-            <a href="https://geckoterminal.com" target="_blank" class="portal-link-btn">
-                🔍 Open Live GeckoTerminal Analytics
-            </a>
+        <!-- 🗺️ TAB 2: ROAD MAP -->
+        <div id="roadmap-tab" class="tab-content">
+            <p class="intro-text">Strategic architecture schedule milestones for the \$POW infrastructure ecosystem.</p>
+            <div class="roadmap-timeline">
+                <div class="roadmap-node done">
+                    <h3>Phase I: Terminal Launch <span>COMPLETED</span></h3>
+                    <p>Establishment of automation infrastructure interfaces, secure tracking parameters, and core validation node systems.</p>
+                </div>
+                <div class="roadmap-node">
+                    <h3>Phase II: Live Smart Contract Binding <span>DEVELOPING</span></h3>
+                    <p>Transition from administrative backup validation networks into direct automated wallet multi-sig deployments execution layers.</p>
+                </div>
+                <div class="roadmap-node">
+                    <h3>Phase III: Multi-Asset Router pools <span>UPCOMING</span></h3>
+                    <p>Integration of expanding allocation target channels across diverse underlying index sets natively on Robinhood Chain.</p>
+                </div>
+            </div>
+        </div>
 
-            <table class="market-table">
-                <thead>
-                    <tr>
-                        <th>Asset Pair</th>
+        <!-- 🐦 TAB 3: ROBINHOOD TWITTER UPDATE -->
+        <div id="twitter-tab" class="tab-content">
+            <p class="intro-text">Live telemetry updates tracking corporate and architectural information feeds from Robinhood networks.</p>
