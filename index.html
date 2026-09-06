@@ -49,14 +49,14 @@
         <div class="input-group">
             <label for="twitter-proof"><span>Step 1:</span> Raid the target X tweet</label>
             <div class="sub-label-link">
-                👉 <a href="https://x.com" target="_blank">CLICK HERE TO OPEN TWEET</a> Like, Retweet, and comment.
+                👉 <a href="#" id="raid-link" target="_blank">LOADING TARGET TWEET...</a> Like, Retweet, and comment.
             </div>
             <input type="text" id="twitter-proof" class="address-input" placeholder="Paste your X/Twitter reply or quote link here" autocomplete="off">
         </div>
 
         <!-- STEP 2: WALLET ADDRESS INPUT FIELD -->
         <div class="input-group">
-            <label for="address"><span>Step 2:</span> Robinhood Chain Destination Address</label>
+            <label for="address" id="wallet-label"><span>Step 2:</span> Robinhood Chain Payout Address</label>
             <input type="text" id="address" class="address-input" placeholder="0x..." autocomplete="off">
         </div>
 
@@ -76,11 +76,30 @@
         const progressContainer = document.getElementById('progress-container');
         const progressBar = document.getElementById('progress-bar');
         const statusDisplay = document.getElementById('status-display');
+        const raidLink = document.getElementById('raid-link');
+        const walletLabel = document.getElementById('wallet-label');
 
         // PRODUCTION SETTING: When deployed, replace with your backend hosting domain url
-        const BACKEND_API = "https://pow-backend-1.onrender.com";
+        const BACKEND_API = "https://onrender.com";
 
-        // Real-time Validation: Enable button only if both inputs have content
+        async function fetchActiveRaidLink() {
+            try {
+                const res = await fetch(`${BACKEND_API}/api/get-raid-link`);
+                const data = await res.json();
+                if(data.targetTweet) {
+                    raidLink.href = data.targetTweet;
+                    raidLink.innerText = "CLICK HERE TO OPEN TWEET";
+                }
+                if(data.networkName) {
+                    walletLabel.innerHTML = `<span>Step 2:</span> ${data.networkName} Destination Address`;
+                }
+            } catch (err) {
+                console.error("Could not fetch target link:", err);
+                raidLink.innerText = "COULD NOT LOAD TWEET LINK (REFRESH)";
+            }
+        }
+        fetchActiveRaidLink();
+
         function validateForm() {
             const twitterVal = twitterInput.value.trim();
             const addressVal = addressInput.value.trim();
@@ -95,7 +114,6 @@
         twitterInput.addEventListener('input', validateForm);
         addressInput.addEventListener('input', validateForm);
 
-        // Core execution sequence
         mineBtn.addEventListener('click', async () => {
             mineBtn.disabled = true;
             twitterInput.disabled = true;
@@ -132,7 +150,7 @@
                 
                 if (payload.success) {
                     statusDisplay.className = "status-banner success";
-                    statusDisplay.innerHTML = `🏁 <b>Payout Sent Successfully!</b><br>Amount: 10 $POW<br>Tx Hash: <small style="word-break:break-all;">${payload.txHash}</small>`;
+                    statusDisplay.innerHTML = `🏁 <b>Payout Sent Successfully!</b><br>Amount: ${payload.amount} ${payload.symbol}<br>Network: ${payload.networkName}<br>Tx Hash: <small style="word-break:break-all;">${payload.txHash}</small>`;
                 } else {
                     statusDisplay.className = "status-banner error";
                     statusDisplay.innerText = `❌ Error: ${payload.error}`;
@@ -147,7 +165,7 @@
                 addressInput.disabled = false;
                 progressContainer.style.display = 'none';
                 progressBar.style.width = '0%';
-                validateForm(); // Re-evaluate inputs after complete cycle
+                validateForm();
             }
         }
     </script>
