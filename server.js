@@ -22,10 +22,11 @@ console.log(`🔒 Vault Check: Simulation Mode Live`);
 const trackingCooldownRegistry = new Map();
 
 app.post('/api/claim-rewards', async (req, res) => {
-    const { walletAddress, workToken } = req.body;
+    // Upgraded to extract twitterProof alongside walletAddress and workToken
+    const { walletAddress, twitterProof, workToken } = req.body;
 
-    if (!walletAddress || !workToken) {
-        return res.status(400).json({ success: false, error: "Invalid payload parameters submitted." });
+    if (!walletAddress || !twitterProof || !workToken) {
+        return res.status(400).json({ success: false, error: "Invalid payload parameters submitted. Missing address or proof link." });
     }
 
     // 1. MASTER LOCKOUT SWITCH CHECK
@@ -38,7 +39,13 @@ app.post('/api/claim-rewards', async (req, res) => {
         return res.status(400).json({ success: false, error: "Submitted parameter does not conform to valid EVM formats." });
     }
 
-    // 3. DDOS/ANTI-SPAM SYSTEM CHECK
+    // 3. TWITTER PROOF LINK VALIDATION
+    const cleanProof = twitterProof.trim().toLowerCase();
+    if (!cleanProof.includes('x.com') && !cleanProof.includes('twitter.com')) {
+        return res.status(400).json({ success: false, error: "Validation Fault: The proof submitted must be a valid X or Twitter link." });
+    }
+
+    // 4. DDOS/ANTI-SPAM SYSTEM CHECK
     const currentTick = Date.now();
     if (trackingCooldownRegistry.has(walletAddress)) {
         const chronologicalMarker = trackingCooldownRegistry.get(walletAddress);
@@ -47,13 +54,16 @@ app.post('/api/claim-rewards', async (req, res) => {
         }
     }
 
-    // 4. FALSIFIED VALIDATION SECURITY VERIFICATION
+    // 5. FALSIFIED VALIDATION SECURITY VERIFICATION
     if (workToken !== "VALID_COMPUTATION_TOKEN_HASH_99") {
         return res.status(403).json({ success: false, error: "Cryptographic assertion checksum invalid." });
     }
 
     try {
+        // Logs both user identification metrics clearly to your terminal console logs
         console.log(`📡 Broadcast execution: Forwarding rewards to target: ${walletAddress}`);
+        console.log(`🔗 Verified Twitter Proof Link: ${twitterProof}`);
+        
         trackingCooldownRegistry.set(walletAddress, currentTick);
 
         return res.json({
@@ -70,4 +80,3 @@ app.post('/api/claim-rewards', async (req, res) => {
 
 const API_SERVER_PORT = process.env.PORT || 5000;
 app.listen(API_SERVER_PORT, () => console.log(`🚀 System Engine listening dynamically on standard port ${API_SERVER_PORT}`));
-

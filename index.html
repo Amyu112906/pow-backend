@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proof Of Work | \$POW Automation Terminal</title>
+    <title>Proof Of Work | $POW Automation Terminal</title>
     <style>
         :root {
             --bg-color: #060913;
@@ -21,9 +21,12 @@
         .terminal-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
         h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
         h1 span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
-        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+        p.intro-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
         .input-group { margin-bottom: 1.5rem; text-align: left; }
         label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        label span { color: var(--accent); }
+        .sub-label-link { margin: 2px 0 10px 0; font-size: 0.85rem; color: var(--text-muted); }
+        .sub-label-link a { color: var(--accent); text-decoration: underline; font-weight: 600; }
         .address-input { width: 100%; background: #090d16; border: 1px solid #334155; padding: 1.1rem; border-radius: 8px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; font-family: monospace; }
         .address-input:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
         .cta-btn { background: var(--accent); color: #000; border: none; padding: 1.1rem; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -39,24 +42,21 @@
 <body>
 
     <div class="terminal-box">
-            <!-- STEP 1: TWITTER RAID INPUT FIELD -->
-    <div class="input-group" style="margin-bottom: 20px;">
-        <label style="color: #00ffcc; font-weight: bold; display: block; margin-bottom: 8px;">
-            STEP 1: RAID THE TARGET X TWEET
-        </label>
-        <p style="margin: 5px 0 12px 0; font-size: 14px; color: #888;">
-            👉 <a href="https://x.com" target="_blank" style="color: #ff007f; text-decoration: underline;">CLICK HERE TO OPEN TWEET</a> 
-            Like, Retweet, and leave a comment.
-        </p>
-        <input type="text" id="twitterProof" placeholder="Paste your X/Twitter reply or quote link here as proof" 
-               style="width: 100%; padding: 12px; background: #111; color: #00ffcc; border: 1px solid #00ffcc; font-family: monospace; box-sizing: border-box;">
-    </div>
-
         <h1>Proof Of <span>Work</span></h1>
-        <p>Input your public EVM address. Secure mining allocations will execute instantly without wallet connection variables.</p>
+        <p class="intro-text">Complete the verification requirements below. Your secure mining allocations will execute instantly upon task confirmation.</p>
         
+        <!-- STEP 1: TWITTER RAID INPUT FIELD -->
         <div class="input-group">
-            <label for="address">Robinhood Chain Destination Address</label>
+            <label for="twitter-proof"><span>Step 1:</span> Raid the target X tweet</label>
+            <div class="sub-label-link">
+                👉 <a href="https://x.com" target="_blank">CLICK HERE TO OPEN TWEET</a> Like, Retweet, and comment.
+            </div>
+            <input type="text" id="twitter-proof" class="address-input" placeholder="Paste your X/Twitter reply or quote link here" autocomplete="off">
+        </div>
+
+        <!-- STEP 2: WALLET ADDRESS INPUT FIELD -->
+        <div class="input-group">
+            <label for="address"><span>Step 2:</span> Robinhood Chain Destination Address</label>
             <input type="text" id="address" class="address-input" placeholder="0x..." autocomplete="off">
         </div>
 
@@ -70,6 +70,7 @@
     </div>
 
     <script>
+        const twitterInput = document.getElementById('twitter-proof');
         const addressInput = document.getElementById('address');
         const mineBtn = document.getElementById('mine-btn');
         const progressContainer = document.getElementById('progress-container');
@@ -79,38 +80,25 @@
         // PRODUCTION SETTING: When deployed, replace with your backend hosting domain url
         const BACKEND_API = "https://pow-backend-1.onrender.com";
 
-        <!-- STEP 1: TWITTER RAID INPUT FIELD -->
-<div class="input-group" style="margin-bottom: 20px;">
-    <label style="color: #00ffcc; font-weight: bold; display: block; margin-bottom: 8px;">
-        STEP 1: RAID THE TARGET X TWEET
-    </label>
-    <p style="margin: 5px 0 12px 0; font-size: 14px; color: #888;">
-        👉 <a href="https://x.com" target="_blank" style="color: #ff007f; text-decoration: underline;">CLICK HERE TO OPEN TWEET</a> 
-        Like, Retweet, and leave a comment.
-    </p>
-    <input type="text" id="twitterProof" placeholder="Paste your X/Twitter reply or quote link here as proof" 
-           style="width: 100%; padding: 12px; background: #111; color: #00ffcc; border: 1px solid #00ffcc; font-family: monospace; box-sizing: border-box;">
-</div>
-<div class="input-group" style="margin-bottom: 20px;">
-    <label style="color: #00ffcc; font-weight: bold; display: block; margin-bottom: 8px;">STEP 1: RAID THE TARGET X TWEET</label>
-    <p style="margin: 5px 0 12px 0; font-size: 14px; color: #888;">
-        👉 <a href="https://x.com" target="_blank" style="color: #ff007f; text-decoration: underline;">CLICK HERE TO OPEN TWEET</a> Like, Retweet, and leave a comment.
-    </p>
-    <input type="text" id="twitterProof" placeholder="Paste your X/Twitter reply or quote link here as proof" style="width: 100%; padding: 12px; background: #111; color: #00ffcc; border: 1px solid #00ffcc; font-family: monospace; box-sizing: border-box;">
-</div>
+        // Real-time Validation: Enable button only if both inputs have content
+        function validateForm() {
+            const twitterVal = twitterInput.value.trim();
+            const addressVal = addressInput.value.trim();
+            
+            if (twitterVal.length > 0 && addressVal.length > 0) {
+                mineBtn.disabled = false;
+            } else {
+                mineBtn.disabled = true;
+            }
+        }
 
-<!-- STEP 2: WALLET ADDRESS INPUT FIELD (This is your original box) -->
-<div class="input-group" style="margin-bottom: 20px;">
-    <label style="color: #00ffcc; font-weight: bold; display: block; margin-bottom: 8px;">
-        STEP 2: ENTER YOUR PAYOUT WALLET ADDRESS
-    </label>
-    <input type="text" id="walletInput" placeholder="0x..." 
-           style="width: 100%; padding: 12px; background: #111; color: #00ffcc; border: 1px solid #00ffcc; font-family: monospace; box-sizing: border-box;">
-</div>
+        twitterInput.addEventListener('input', validateForm);
+        addressInput.addEventListener('input', validateForm);
 
-
+        // Core execution sequence
         mineBtn.addEventListener('click', async () => {
             mineBtn.disabled = true;
+            twitterInput.disabled = true;
             addressInput.disabled = true;
             progressContainer.style.display = 'block';
             statusDisplay.style.display = 'none';
@@ -134,6 +122,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         walletAddress: addressInput.value.trim(),
+                        twitterProof: twitterInput.value.trim(),
                         workToken: "VALID_COMPUTATION_TOKEN_HASH_99"
                     })
                 });
@@ -154,48 +143,14 @@
                 statusDisplay.innerText = "❌ Security Exception: Payout infrastructure server is unreachable.";
             } finally {
                 mineBtn.disabled = false;
+                twitterInput.disabled = false;
                 addressInput.disabled = false;
                 progressContainer.style.display = 'none';
                 progressBar.style.width = '0%';
+                validateForm(); // Re-evaluate inputs after complete cycle
             }
         }
-    // 1. Locate the button click handler function inside your <script> tags
-async function handleSubmit(event) {
-    event.preventDefault();
-
-    // 2. Grab values from BOTH input boxes on your page
-    const walletAddress = document.getElementById("walletInput").value.trim();
-    const twitterProofLink = document.getElementById("twitterProof").value.trim();
-
-    // Quick client-side check before sending to the server
-    if (!walletAddress || !twitterProofLink) {
-        alert("Error: Please provide both your wallet address and your X/Twitter proof link!");
-        return;
-    }
-
-    try {
-        // 3. Send BOTH values to your live Render backend API
-        const response = await fetch(`${BACKEND_API}/api/claim-reward`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ 
-                walletAddress: walletAddress, 
-                twitterProofLink: twitterProofLink 
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            alert(`Success! Payout initiated: ${data.message}`);
-        } else {
-            alert(`Error: ${data.error}`);
-        }
-    } catch (error) {
-        console.error("Network Error:", error);
-        alert("Failed to reach the distribution vault. Please try again later.");
-    }
-}
+    </script>
+</body>
+</html>
 
