@@ -23,7 +23,7 @@ const RUNTIME_STATE = {
     // 🌐 NETWORK SETTINGS FOR ROBINHOOD CHAIN
     NETWORK_NAME: "Robinhood Chain",
     CHAIN_ID: 4663,
-    RPC_URL: "https://robinhood.com", // 🟢 Safe public RPC endpoint
+    RPC_URL: "https://robinhood.com", 
 
     // 🪙 TOKEN SPECIFICATIONS (8 decimals for WBTC)
     TOKEN_SYMBOL: "WBTC",
@@ -47,7 +47,6 @@ const ERC20_MINIMAL_ABI = [
     "function balanceOf(address owner) public view returns (uint256)"
 ];
 
-// 🟢 FIX: Production node validation architecture completely safety-wrapped
 try {
     if (process.env.PRIVATE_KEY) {
         networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL);
