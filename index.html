@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proof Of Work | $POW Automation Terminal</title>
+    <title>POW Automation Control Terminal</title>
     <style>
         :root {
             --bg-color: #060913;
@@ -14,161 +14,138 @@
             --text-muted: #94a3b8;
             --success: #10b981;
             --error: #f43f5e;
+            --border-color: #1e293b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
-        .terminal-box { background: var(--card-bg); width: 100%; max-width: 580px; padding: 2.5rem; border-radius: 16px; border: 1px solid #1e293b; box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        
+        .terminal-box { background: var(--card-bg); width: 100%; max-width: 680px; padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; }
         .terminal-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
-        h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+        
+        .tabs-nav { display: flex; flex-wrap: wrap; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; gap: 0.25rem; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 0.75rem 1rem; font-size: 0.85rem; font-weight: 700; cursor: pointer; border-radius: 6px 6px 0 0; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(255, 159, 67, 0.05); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.25rem; }
         h1 span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
-        p.intro-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
-        .input-group { margin-bottom: 1.5rem; text-align: left; }
-        label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        p.intro-text { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        
+        .input-group { margin-bottom: 1.25rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
         label span { color: var(--accent); }
         .sub-label-link { margin: 2px 0 10px 0; font-size: 0.85rem; color: var(--text-muted); }
         .sub-label-link a { color: var(--accent); text-decoration: underline; font-weight: 600; }
-        .address-input { width: 100%; background: #090d16; border: 1px solid #334155; padding: 1.1rem; border-radius: 8px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; font-family: monospace; }
+        
+        .address-input { width: 100%; background: #090d16; border: 1px solid #334155; padding: 1rem; border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none; transition: 0.3s; font-family: monospace; }
         .address-input:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-        .cta-btn { background: var(--accent); color: #000; border: none; padding: 1.1rem; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .cta-btn { background: var(--accent); color: #000; border: none; padding: 1rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; }
         .cta-btn:hover { background: #ffb366; box-shadow: 0 0 20px var(--accent-glow); }
         .cta-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
+        
+        .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .stat-card { background: #090d16; border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 8px; text-align: left; }
+        .stat-card .val { font-size: 1.3rem; font-weight: bold; color: #fff; font-family: monospace; margin-top: 0.25rem; }
+
+        /* 🆕 GENERAL CRYPTO MARKET TABLE STYLING */
+        .market-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: #090d16; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); text-align: left; }
+        .market-table th, .market-table td { padding: 1rem; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); }
+        .market-table th { background: rgba(255,255,255,0.02); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        .market-table td { font-family: monospace; color: #fff; }
+        .market-table td.asset-name { font-family: inherit; font-weight: 700; }
+        .crypto-up { color: var(--success) !important; }
+        .crypto-down { color: var(--error) !important; }
+
+        .roadmap-timeline { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
+        .roadmap-node { background: #090d16; border-left: 3px solid var(--accent); padding: 1rem; border-radius: 0 8px 8px 0; text-align: left; }
+        .roadmap-node.done { border-left-color: var(--success); }
+        .roadmap-node h3 { font-size: 1.05rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; }
+        .roadmap-node h3 span { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,159,67,0.1); color: var(--accent); }
+        .roadmap-node.done h3 span { background: rgba(16,185,129,0.1); color: var(--success); }
+        .roadmap-node p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
         .progress-track { width: 100%; background: #1e293b; height: 8px; border-radius: 4px; margin-top: 1.5rem; display: none; overflow: hidden; }
-        .progress-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 8px var(--accent); transition: width 0.1s linear; }
-        .status-banner { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: left; border: 1px solid transparent; }
-        .status-banner.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: var(--success); }
-        .status-banner.error { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3); color: var(--error); }
+        .progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.1s linear; }
+        .status-banner { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: left; }
+        .status-banner.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: var(--success); border: 1px solid; }
+        .status-banner.error { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3); color: var(--error); border: 1px solid; }
     </style>
 </head>
 <body>
 
     <div class="terminal-box">
-        <h1>Proof Of <span>Work</span></h1>
-        <p class="intro-text">Complete the verification requirements below. Your secure mining allocations will execute instantly upon task confirmation.</p>
+        <h1>POW <span>Terminal</span></h1>
+        <p class="intro-text">Automation and Analytics Dashboard Suite</p>
         
-        <!-- STEP 1: TWITTER RAID INPUT FIELD -->
-        <div class="input-group">
-            <label for="twitter-proof"><span>Step 1:</span> Raid the target X tweet</label>
-            <div class="sub-label-link">
-                👉 <a href="#" id="raid-link" target="_blank">LOADING TARGET TWEET...</a> Like, Retweet, and comment.
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('rewards-tab', this)">💎 Rewards Center</button>
+            <button class="tab-btn" onclick="switchTab('market-tab', this); fetchLivePriceFeeds();">📊 Market Tracking</button>
+            <button class="tab-btn" onclick="switchTab('roadmap-tab', this)">🗺️ Road Map</button>
+            <button class="tab-btn" onclick="switchTab('twitter-tab', this)">🐦 Robinhood Updates</button>
+        </div>
+
+        <!-- 💎 TAB 1: REWARDS CENTER -->
+        <div id="rewards-tab" class="tab-content active">
+            <div class="input-group">
+                <label for="twitter-proof"><span>Step 1:</span> Complete Active X Raid</label>
+                <div class="sub-label-link">
+                    👉 <a href="#" id="raid-link" target="_blank">LOADING ACTIVE CAMPAIGN...</a> Like & Retweet.
+                </div>
+                <input type="text" id="twitter-proof" class="address-input" placeholder="Paste your X/Twitter interaction proof link here" autocomplete="off">
             </div>
-            <input type="text" id="twitter-proof" class="address-input" placeholder="Paste your X/Twitter reply or quote link here" autocomplete="off">
+
+            <div class="input-group">
+                <label for="address"><span>Step 2:</span> Robinhood Chain Recipient Address</label>
+                <input type="text" id="address" class="address-input" placeholder="0x..." autocomplete="off">
+            </div>
+
+            <button class="cta-btn" id="mine-btn" disabled>Execute Computing Task</button>
+            <div class="progress-track" id="progress-container"><div class="progress-fill" id="progress-bar"></div></div>
+            <div id="status-display" class="status-banner"></div>
+
+            <h2 style="font-size:1.1rem; margin-top:2rem; margin-bottom:0.5rem; text-align:left;">Check Account Profile Stats</h2>
+            <div class="market-grid" style="margin-top:0;">
+                <div class="stat-card">
+                    <label>Account Lifetime Payout</label>
+                    <div id="reward-stat-lifetime" class="val">0.00000000 WBTC</div>
+                </div>
+                <div class="stat-card">
+                    <label>Anti-Spam Lockout status</label>
+                    <button style="background:transparent; border:none; color:var(--accent); float:right; font-size:0.75rem; cursor:pointer;" onclick="fetchWorkerAccountDetails()">[REFRESH]</button>
+                    <div id="reward-stat-cooldown" class="val">0 Min Left</div>
+                </div>
+            </div>
         </div>
 
-        <!-- STEP 2: WALLET ADDRESS INPUT FIELD -->
-        <div class="input-group">
-            <label for="address" id="wallet-label"><span>Step 2:</span> Robinhood Chain Payout Address</label>
-            <input type="text" id="address" class="address-input" placeholder="0x..." autocomplete="off">
-        </div>
-
-        <button class="cta-btn" id="mine-btn" disabled>Execute Computing Task</button>
-
-        <div class="progress-track" id="progress-container">
-            <div class="progress-fill" id="progress-bar"></div>
-        </div>
-
-        <div id="status-display" class="status-banner"></div>
-    </div>
-
-    <script>
-        const twitterInput = document.getElementById('twitter-proof');
-        const addressInput = document.getElementById('address');
-        const mineBtn = document.getElementById('mine-btn');
-        const progressContainer = document.getElementById('progress-container');
-        const progressBar = document.getElementById('progress-bar');
-        const statusDisplay = document.getElementById('status-display');
-        const raidLink = document.getElementById('raid-link');
-        const walletLabel = document.getElementById('wallet-label');
-
-        // PRODUCTION SETTING: When deployed, replace with your backend hosting domain url
-        const BACKEND_API = "https://onrender.com";
-
-        async function fetchActiveRaidLink() {
-            try {
-                const res = await fetch(`${BACKEND_API}/api/get-raid-link`);
-                const data = await res.json();
-                if(data.targetTweet) {
-                    raidLink.href = data.targetTweet;
-                    raidLink.innerText = "CLICK HERE TO OPEN TWEET";
-                }
-                if(data.networkName) {
-                    walletLabel.innerHTML = `<span>Step 2:</span> ${data.networkName} Destination Address`;
-                }
-            } catch (err) {
-                console.error("Could not fetch target link:", err);
-                raidLink.innerText = "COULD NOT LOAD TWEET LINK (REFRESH)";
-            }
-        }
-        fetchActiveRaidLink();
-
-        function validateForm() {
-            const twitterVal = twitterInput.value.trim();
-            const addressVal = addressInput.value.trim();
+        <!-- 📊 TAB 2: GENERAL CRYPTO MARKET TRACKING -->
+        <div id="market-tab" class="tab-content">
+            <p class="intro-text">Live index feeds tracking broad cryptocurrency performance asset variations.</p>
             
-            if (twitterVal.length > 0 && addressVal.length > 0) {
-                mineBtn.disabled = false;
-            } else {
-                mineBtn.disabled = true;
-            }
-        }
-
-        twitterInput.addEventListener('input', validateForm);
-        addressInput.addEventListener('input', validateForm);
-
-        mineBtn.addEventListener('click', async () => {
-            mineBtn.disabled = true;
-            twitterInput.disabled = true;
-            addressInput.disabled = true;
-            progressContainer.style.display = 'block';
-            statusDisplay.style.display = 'none';
-
-            let fillPercentage = 0;
-            const miningSimulation = setInterval(() => {
-                if (fillPercentage >= 100) {
-                    clearInterval(miningSimulation);
-                    submitWorkToBackend();
-                } else {
-                    fillPercentage += 4;
-                    progressBar.style.width = fillPercentage + '%';
-                }
-            }, 80);
-        });
-
-        async function submitWorkToBackend() {
-            try {
-                const response = await fetch(`${BACKEND_API}/api/claim-rewards`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        walletAddress: addressInput.value.trim(),
-                        twitterProof: twitterInput.value.trim(),
-                        workToken: "VALID_COMPUTATION_TOKEN_HASH_99"
-                    })
-                });
-                
-                const payload = await response.json();
-                statusDisplay.style.display = 'block';
-                
-                if (payload.success) {
-                    statusDisplay.className = "status-banner success";
-                    statusDisplay.innerHTML = `🏁 <b>Payout Sent Successfully!</b><br>Amount: ${payload.amount} ${payload.symbol}<br>Network: ${payload.networkName}<br>Tx Hash: <small style="word-break:break-all;">${payload.txHash}</small>`;
-                } else {
-                    statusDisplay.className = "status-banner error";
-                    statusDisplay.innerText = `❌ Error: ${payload.error}`;
-                }
-            } catch (err) {
-                statusDisplay.style.display = 'block';
-                statusDisplay.className = "status-banner error";
-                statusDisplay.innerText = "❌ Security Exception: Payout infrastructure server is unreachable.";
-            } finally {
-                mineBtn.disabled = false;
-                twitterInput.disabled = false;
-                addressInput.disabled = false;
-                progressContainer.style.display = 'none';
-                progressBar.style.width = '0%';
-                validateForm();
-            }
-        }
-    </script>
-</body>
-</html>
-
+            <table class="market-table">
+                <thead>
+                    <tr>
+                        <th>Asset Pair</th>
+                        <th>Spot Price</th>
+                        <th>24H Trend</th>
+                    </tr>
+                </thead>
+                <tbody id="market-table-body">
+                    <tr>
+                        <td class="asset-name">BTC / USD</td>
+                        <td id="price-btc">Loading...</td>
+                        <td id="change-btc">--</td>
+                    </tr>
+                    <tr>
+                        <td class="asset-name">ETH / USD</td>
+                        <td id="price-eth">Loading...</td>
+                        <td id="change-eth">--</td>
+                    </tr>
+                    <tr>
+                        <td class="asset-name">SOL / USD</td>
+                        <td id="price-sol">Loading...</td>
+                        <td id="change-sol">--</td>
+                    </tr>
