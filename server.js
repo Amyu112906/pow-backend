@@ -3,7 +3,7 @@ const cors = require('cors');
 const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
-const fetch = require('node-fetch'); // Ensure you run: npm install node-fetch
+const axios = require('axios'); // 🟢 Swapped node-fetch for axios to fix the Render deploy crash
 require('dotenv').config(); 
 
 const app = express();
@@ -77,29 +77,27 @@ function writeToLedger(logLine) {
     });
 }
 
-// 🌐 ADVANCED MULTI-STEP TWITTER ENGAGEMENT VERIFIER
+// 🌐 ADVANCED MULTI-STEP TWITTER ENGAGEMENT VERIFIER (Powered by Axios)
 async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHandle) {
     const cleanWorker = workerHandle.replace('@', '').trim().toLowerCase();
     const cleanOfficial = officialHandle.replace('@', '').trim().toLowerCase();
     
     try {
         // --- STEP A: VERIFY LIKE AND RETWEET ON THE RAID POST ---
-        const tweetResponse = await fetch(`https://nitter.net{targetTweetId}`, {
+        const tweetResponse = await axios.get(`https://nitter.net{targetTweetId}`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
-        if (!tweetResponse.ok) throw new Error("Tweet telemetric data unreadable.");
         
-        const tweetHtml = (await tweetResponse.text()).toLowerCase();
+        const tweetHtml = tweetResponse.data.toLowerCase();
         const hasLiked = tweetHtml.includes(`liked by /${cleanWorker}`) || tweetHtml.includes(`/${cleanWorker}`);
         const hasRetweeted = tweetHtml.includes(`retweeted by /${cleanWorker}`) || tweetHtml.includes(`/${cleanWorker}`);
 
         // --- STEP B: VERIFY FOLLOW STATUS ON THE OFFICIAL ACCOUNT PROFILE ---
-        const profileResponse = await fetch(`https://nitter.net{cleanOfficial}/followers`, {
+        const profileResponse = await axios.get(`https://nitter.net{cleanOfficial}/followers`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
-        if (!profileResponse.ok) throw new Error("Official profile tracking data unreadable.");
         
-        const profileHtml = (await profileResponse.text()).toLowerCase();
+        const profileHtml = profileResponse.data.toLowerCase();
         const hasFollowed = profileHtml.includes(`/${cleanWorker}`) || profileHtml.includes(`title="@${cleanWorker}"`);
 
         // Developer local staging simulation bypass rule
@@ -125,7 +123,7 @@ async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHa
         return { verified: true, error: null };
         
     } catch (scrapeError) {
-        console.error("Scraper channel exception:", scrapeError);
+        console.error("Scraper channel exception:", scrapeError.message);
         return { verified: true, warning: "Outage anomaly bypassed filter check securely." };
     }
 }
@@ -227,3 +225,7 @@ app.post('/api/claim-rewards', async (req, res) => {
         });
     } catch (err) {
         return res.status(500).json({ success: false, error: "Execution node failure." });
+    }
+});
+
+const API_SERVER_PORT = process.env.PORT || 5000;
