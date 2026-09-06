@@ -6,16 +6,15 @@
     <title>POW Automation Control Terminal</title>
     <style>
         :root {
-            /* 🟢 RECONFIGURED ROBINHOOD BRAND COLOR SYSTEM */
-            --bg-color: #04080f;          /* Midnight Obsidian Space Deep Background */
-            --card-bg: #0b121f;           /* Sleek Matte Navy Carbon Card Body */
-            --accent: #00c805;            /* Iconic Robinhood Feather Green Accent */
-            --accent-glow: rgba(0, 200, 5, 0.2); /* Soft Radioactive Emerald Green Ambient Glow */
-            --text-main: #ffffff;         /* Crisp Snow White Primary Labels */
-            --text-muted: #8a99a8;        /* Slate Silver Subtle Secondary Captions */
-            --success: #00e676;           /* Electric Mint Confirmation Success */
-            --error: #f43f5e;             /* Crimson Warning Alert Feedback */
-            --border-color: #1a2638;      /* Deep Cyber Steel Boundary Lines */
+            --bg-color: #04080f;          
+            --card-bg: #0b121f;           
+            --accent: #00c805;            
+            --accent-glow: rgba(0, 200, 5, 0.2); 
+            --text-main: #ffffff;         
+            --text-muted: #8a99a8;        
+            --success: #00e676;           
+            --error: #f43f5e;             
+            --border-color: #1a2638;      
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
@@ -85,11 +84,11 @@
         <!-- 💎 TAB 1: REWARDS CENTER -->
         <div id="rewards-tab" class="tab-content active">
             <div class="input-group">
-                <label for="twitter-proof"><span>Step 1:</span> Complete Active X Raid</label>
+                <label for="twitter-proof"><span>Step 1:</span> Input Your Public X Handle Name</label>
                 <div class="sub-label-link">
-                    👉 <a href="https://x.com" id="raid-link" target="_blank">https://x.com/POW_Crypto/status/2096562867428372849?s=20</a> Like & Retweet.
+                    👉 <a href="#" id="raid-link" target="_blank">CLICK HERE TO OPEN TWEET</a> Like & Retweet.
                 </div>
-                <input type="text" id="twitter-proof" class="address-input" placeholder="Paste your X/Twitter interaction proof link here" autocomplete="off">
+                <input type="text" id="twitter-proof" class="address-input" placeholder="Enter your username (e.g. @CryptoWorker)" autocomplete="off">
             </div>
 
             <div class="input-group">
@@ -129,3 +128,11 @@
                 </div>
                 <div class="roadmap-node">
                     <h3>Phase III: Multi-Asset Router pools <span>UPCOMING</span></h3>
+                    <p>Integration of expanding allocation target channels across diverse underlying index sets natively on Robinhood Chain.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🐦 TAB 3: ROBINHOOD TWITTER UPDATE -->
+        <div id="twitter-tab" class="tab-content">
+            <p class="intro-text">Live telemetry updates tracking corporate and architectural information feeds from Robinhood networks.</p>
