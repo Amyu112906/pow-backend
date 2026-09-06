@@ -13,18 +13,20 @@ app.use(express.json());
 // 🎛️ ADMINISTRATIVE CONFIGURATION AND CONTROL SWITCHES
 const RUNTIME_STATE = {
     PAYOUTS_ENABLED: true,       
-    ANTI_SPAM_COOLDOWN_MS: 3600000, 
     
-    // 👇 UPDATE TWEET ID HERE (The long numerical string from your target post URL)
+    // 👇 YOUR CAMPAIGN PARAMETERS (Update these when a new raid is live)
     TARGET_RAID_TWEET_ID: "1234567890123456789", 
     TARGET_RAID_TWEET_URL: "https://x.com",
+    
+    // 🏷️ OFFICIAL ACCOUNT TO FOLLOW
+    OFFICIAL_POW_HANDLE: "pow_crypto", 
 
     // 🌐 NETWORK SETTINGS FOR ROBINHOOD CHAIN
     NETWORK_NAME: "Robinhood Chain",
     CHAIN_ID: 4663,
     RPC_URL: "https://robinhood.com",
 
-    // 🪙 TOKEN SPECIFICATIONS
+    // 🪙 TOKEN SPECIFICATIONS (8 decimals for WBTC)
     TOKEN_SYMBOL: "WBTC",
     TOKEN_CONTRACT_ADDRESS: "0x5F26515668705582ac2FB11322060026Db2FffC1", 
     TOKEN_DECIMALS: 8,
@@ -33,8 +35,35 @@ const RUNTIME_STATE = {
 };
 
 const LEDGER_FILE_PATH = path.join(__dirname, 'payout_ledger.txt');
-const trackingCooldownRegistry = new Map();
 const userPayoutDatabase = new Map(); 
+const permanentClaimedTasksRegistry = new Map();
+
+// Connect live network pipeline to Robinhood Chain node
+let networkProvider;
+let administrationSignerWallet;
+let tokenContract;
+
+const ERC20_MINIMAL_ABI = [
+    "function transfer(address to, uint256 value) public returns (bool)",
+    "function balanceOf(address owner) public view returns (uint256)"
+];
+
+try {
+    networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL, {
+        chainId: RUNTIME_STATE.CHAIN_ID,
+        name: RUNTIME_STATE.NETWORK_NAME
+    });
+
+    if (process.env.PRIVATE_KEY) {
+        administrationSignerWallet = new ethers.Wallet(process.env.PRIVATE_KEY, networkProvider);
+        tokenContract = new ethers.Contract(RUNTIME_STATE.TOKEN_CONTRACT_ADDRESS, ERC20_MINIMAL_ABI, administrationSignerWallet);
+        console.log(`🔒 Vault Ready: Live Production Mode Active.`);
+    } else {
+        console.warn(`⚠️ Warning: Missing process.env.PRIVATE_KEY. Running in simulation mode.`);
+    }
+} catch (initError) {
+    console.error("Critical: Failed to connect to Robinhood Chain Node:", initError);
+}
 
 function calculateWbtcRewardAmount() {
     const exactTokens = RUNTIME_STATE.USD_REWARD_LIMIT / RUNTIME_STATE.MOCK_BTC_PRICE_USD;
@@ -48,34 +77,41 @@ function writeToLedger(logLine) {
     });
 }
 
-// 🌐 AUTOMATED VERIFICATION TIMELINE SCRAPER
-async function verifyTwitterInteractions(targetTweetId, workerHandle) {
-    const cleanHandle = workerHandle.replace('@', '').trim().toLowerCase();
+// 🌐 ADVANCED MULTI-STEP TWITTER ENGAGEMENT VERIFIER
+async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHandle) {
+    const cleanWorker = workerHandle.replace('@', '').trim().toLowerCase();
+    const cleanOfficial = officialHandle.replace('@', '').trim().toLowerCase();
     
     try {
-        // Querying data rows from non-rate-limited scraping nodes (Nitter mirror engines)
-        const response = await fetch(`https://nitter.net{targetTweetId}`, {
+        // --- STEP A: VERIFY LIKE AND RETWEET ON THE RAID POST ---
+        const tweetResponse = await fetch(`https://nitter.net{targetTweetId}`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
         });
+        if (!tweetResponse.ok) throw new Error("Tweet telemetric data unreadable.");
         
-        if (!response.ok) {
-            throw new Error("Telemetry mirror endpoint unreadable.");
-        }
+        const tweetHtml = (await tweetResponse.text()).toLowerCase();
+        const hasLiked = tweetHtml.includes(`liked by /${cleanWorker}`) || tweetHtml.includes(`/${cleanWorker}`);
+        const hasRetweeted = tweetHtml.includes(`retweeted by /${cleanWorker}`) || tweetHtml.includes(`/${cleanWorker}`);
+
+        // --- STEP B: VERIFY FOLLOW STATUS ON THE OFFICIAL ACCOUNT PROFILE ---
+        const profileResponse = await fetch(`https://nitter.net{cleanOfficial}/followers`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+        });
+        if (!profileResponse.ok) throw new Error("Official profile tracking data unreadable.");
         
-        const pageHtml = await response.text();
-        const htmlLower = pageHtml.toLowerCase();
-        
-        // Audit presence inside engagement lists
-        const hasLiked = htmlLower.includes(`liked by /${cleanHandle}`) || htmlLower.includes(`/${cleanHandle}`);
-        const hasRetweeted = htmlLower.includes(`retweeted by /${cleanHandle}`) || htmlLower.includes(`/${cleanHandle}`);
-        
-        // Skip live scrape filter blocks strictly during local staging previews
+        const profileHtml = (await profileResponse.text()).toLowerCase();
+        const hasFollowed = profileHtml.includes(`/${cleanWorker}`) || profileHtml.includes(`title="@${cleanWorker}"`);
+
+        // Developer local staging simulation bypass rule
         if (process.env.NODE_ENV !== 'production') {
-            console.log(`📡 Dev Node Simulation: Verified @${cleanHandle}`);
+            console.log(`📡 Dev Mode verification logs: Like=${hasLiked}, Retweet=${hasRetweeted}, Follow=${hasFollowed}`);
             return { verified: true };
         }
 
-        // 🛑 STRICT RULE ENFORCEMENT: Enforces both actions simultaneously
+        // 🛑 ENFORCE TRIPLE-ACTION ALGORITHM RULES SIMULTANEOUSLY
+        if (!hasFollowed) {
+            return { verified: false, error: `Task Deficit: You must follow our official account @${officialHandle.toUpperCase()} to unlock rewards.` };
+        }
         if (!hasLiked && !hasRetweeted) {
             return { verified: false, error: "Task Deficit: Account handle not detected on the interaction lists. Ensure your profile privacy is set to Public." };
         }
@@ -89,8 +125,7 @@ async function verifyTwitterInteractions(targetTweetId, workerHandle) {
         return { verified: true, error: null };
         
     } catch (scrapeError) {
-        console.error("Scraper channel drop exception:", scrapeError);
-        // Fallback confirmation flag safeguarding continuity if mirror proxies report downtime spikes
+        console.error("Scraper channel exception:", scrapeError);
         return { verified: true, warning: "Outage anomaly bypassed filter check securely." };
     }
 }
@@ -101,23 +136,20 @@ app.post('/api/check-balance', (req, res) => {
         return res.status(400).json({ success: false, error: "Invalid EVM wallet address." });
     }
 
-    const currentTick = Date.now();
-    let cooldownRemaining = 0;
+    const normalizedAddress = walletAddress.toLowerCase();
+    const currentTweetId = RUNTIME_STATE.TARGET_RAID_TWEET_ID;
     
-    if (trackingCooldownRegistry.has(walletAddress)) {
-        const marker = trackingCooldownRegistry.get(walletAddress);
-        const elapsed = currentTick - marker;
-        if (elapsed < RUNTIME_STATE.ANTI_SPAM_COOLDOWN_MS) {
-            cooldownRemaining = Math.ceil((RUNTIME_STATE.ANTI_SPAM_COOLDOWN_MS - elapsed) / 60000);
-        }
+    let taskAlreadyClaimed = false;
+    if (permanentClaimedTasksRegistry.has(currentTweetId)) {
+        taskAlreadyClaimed = permanentClaimedTasksRegistry.get(currentTweetId).has(normalizedAddress);
     }
 
-    const totalClaimed = userPayoutDatabase.get(walletAddress) || 0;
+    const totalClaimed = userPayoutDatabase.get(normalizedAddress) || 0;
     res.json({
         success: true,
         lifetimeRewards: totalClaimed.toFixed(RUNTIME_STATE.TOKEN_DECIMALS),
         tokenSymbol: RUNTIME_STATE.TOKEN_SYMBOL,
-        cooldownMinutesLeft: cooldownRemaining
+        cooldownMinutesLeft: taskAlreadyClaimed ? -1 : 0 
     });
 });
 
@@ -140,50 +172,58 @@ app.post('/api/claim-rewards', async (req, res) => {
         return res.status(400).json({ success: false, error: "Malformed wallet structure." });
     }
 
+    const normalizedAddress = walletAddress.toLowerCase();
+    const currentTweetId = RUNTIME_STATE.TARGET_RAID_TWEET_ID;
     const cleanHandle = twitterProof.trim().replace('@', '');
+
     if (cleanHandle.length < 1 || cleanHandle.includes('/') || cleanHandle.includes(' ')) {
         return res.status(400).json({ success: false, error: "Input Fault: Provide a clean X account handle username." });
     }
 
-    const currentTick = Date.now();
-    if (trackingCooldownRegistry.has(walletAddress)) {
-        const chronologicalMarker = trackingCooldownRegistry.get(walletAddress);
-        if (currentTick - chronologicalMarker < RUNTIME_STATE.ANTI_SPAM_COOLDOWN_MS) {
-            return res.status(429).json({ success: false, error: "Security Hold: Cooldown active." });
-        }
+    if (!permanentClaimedTasksRegistry.has(currentTweetId)) {
+        permanentClaimedTasksRegistry.set(currentTweetId, new Set());
+    }
+    
+    const taskClaimHistorySet = permanentClaimedTasksRegistry.get(currentTweetId);
+    if (taskClaimHistorySet.has(normalizedAddress)) {
+        return res.status(429).json({ success: false, error: "Double-Claim Security Block: Payout was already issued to this wallet for the current work task." });
     }
 
     if (workToken !== "VALID_COMPUTATION_TOKEN_HASH_99") {
         return res.status(403).json({ success: false, error: "Cryptographic assertion checksum invalid." });
     }
 
-    // 🔥 RUN THE UPGRADED VERIFICATION STRATEGIES
-    const evaluation = await verifyTwitterInteractions(RUNTIME_STATE.TARGET_RAID_TWEET_ID, cleanHandle);
+    // 🔥 RUN THE TRIPLE-ACTION ENGAGEMENT FILTER ENGINE
+    const evaluation = await verifyTwitterInteractions(currentTweetId, RUNTIME_STATE.OFFICIAL_POW_HANDLE, cleanHandle);
     if (!evaluation.verified) {
         return res.status(403).json({ success: false, error: evaluation.error });
     }
 
     try {
         const finalCalculatedPayout = calculateWbtcRewardAmount();
-        const txHash = "0xMainnetTx_" + Math.random().toString(16).substr(2, 32);
+        let transactionHash = "";
 
-        trackingCooldownRegistry.set(walletAddress, currentTick);
-        const baselinePrevious = userPayoutDatabase.get(walletAddress) || 0;
-        userPayoutDatabase.set(walletAddress, baselinePrevious + parseFloat(finalCalculatedPayout));
+        if (administrationSignerWallet && tokenContract) {
+            const rawTokenSubunits = ethers.parseUnits(finalCalculatedPayout, RUNTIME_STATE.TOKEN_DECIMALS);
+            const txResponse = await tokenContract.transfer(walletAddress, rawTokenSubunits);
+            const txReceipt = await txResponse.wait(1);
+            transactionHash = txReceipt.hash;
+        } else {
+            transactionHash = "0xMainnetTx_" + Math.random().toString(16).substr(2, 32);
+        }
 
-        writeToLedger(`SUCCESS | Wallet: ${walletAddress} | Handle: @${cleanHandle} | Amount: ${finalCalculatedPayout} WBTC | Tx: ${txHash}`);
+        taskClaimHistorySet.add(normalizedAddress);
+        const baselinePrevious = userPayoutDatabase.get(normalizedAddress) || 0;
+        userPayoutDatabase.set(normalizedAddress, baselinePrevious + parseFloat(finalCalculatedPayout));
+
+        writeToLedger(`SUCCESS | Wallet: ${walletAddress} | Handle: @${cleanHandle} | TweetID: ${currentTweetId} | Amount: ${finalCalculatedPayout} WBTC | Tx: ${transactionHash}`);
 
         return res.json({
             success: true,
             amount: finalCalculatedPayout,
             symbol: RUNTIME_STATE.TOKEN_SYMBOL,
             networkName: RUNTIME_STATE.NETWORK_NAME,
-            txHash: txHash
+            txHash: transactionHash
         });
     } catch (err) {
         return res.status(500).json({ success: false, error: "Execution node failure." });
-    }
-});
-
-const API_SERVER_PORT = process.env.PORT || 5000;
-app.listen(API_SERVER_PORT, () => console.log(`🚀 Terminal running on port ${API_SERVER_PORT}`));
