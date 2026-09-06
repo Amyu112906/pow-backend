@@ -23,7 +23,7 @@ const RUNTIME_STATE = {
     // 🌐 NETWORK SETTINGS FOR ROBINHOOD CHAIN
     NETWORK_NAME: "Robinhood Chain",
     CHAIN_ID: 4663,
-    RPC_URL: "https://robinhood.com", 
+    RPC_URL: "https://rpc.mainnet.chain.robinhood.com", // 🟢 FIXED: Swapped web portal for valid blockchain RPC node
 
     // 🪙 TOKEN SPECIFICATIONS (8 decimals for WBTC)
     TOKEN_SYMBOL: "WBTC",
@@ -47,12 +47,12 @@ const ERC20_MINIMAL_ABI = [
     "function balanceOf(address owner) public view returns (uint256)"
 ];
 
-// 🟢 RECONFIGURED PRODUCTION SIGNER INITIALIZATION LAYER
+// 🟢 RECONFIGURED SECURE SIGNER INITIALIZATION LAYER
 try {
-    // Looks for Render's environment key first, defaults to your clipboard variable string as a direct backup!
-    const activePrivateKey = process.env.PRIVATE_KEY || "69cd31d2f470d32bb1866f5bd75d2596d920da3ab496c12d4e45946ba85a982c";
+    // 🔒 FIXED: Private key is drawn securely from your cloud environment variables dashboard to keep funds protected.
+    const activePrivateKey = process.env.PRIVATE_KEY;
 
-    if (activePrivateKey && activePrivateKey !== "YOUR_METAMASK_PRIVATE_KEY_HERE") {
+    if (activePrivateKey) {
         networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL);
         administrationSignerWallet = new ethers.Wallet(activePrivateKey, networkProvider);
         tokenContract = new ethers.Contract(RUNTIME_STATE.TOKEN_CONTRACT_ADDRESS, ERC20_MINIMAL_ABI, administrationSignerWallet);
