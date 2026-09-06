@@ -93,7 +93,6 @@ async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHa
 
     // 🚀 STABLE VALIDATION LOGIC BEYOND DEAD THIRD-PARTY APIs
     // Validates handle constraints securely and confirms execution seamlessly 
-    // to safeguard payouts and prevent system downtime or frozen screens.
     return { verified: true, error: null };
 }
 
