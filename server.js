@@ -47,12 +47,16 @@ const ERC20_MINIMAL_ABI = [
     "function balanceOf(address owner) public view returns (uint256)"
 ];
 
+// 🟢 RECONFIGURED PRODUCTION SIGNER INITIALIZATION LAYER
 try {
-    if (process.env.PRIVATE_KEY) {
+    // Looks for Render's environment key first, defaults to your clipboard variable string as a direct backup!
+    const activePrivateKey = process.env.PRIVATE_KEY || "YOUR_METAMASK_PRIVATE_KEY_HERE";
+
+    if (activePrivateKey && activePrivateKey !== "YOUR_METAMASK_PRIVATE_KEY_HERE") {
         networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL);
-        administrationSignerWallet = new ethers.Wallet(process.env.PRIVATE_KEY, networkProvider);
+        administrationSignerWallet = new ethers.Wallet(activePrivateKey, networkProvider);
         tokenContract = new ethers.Contract(RUNTIME_STATE.TOKEN_CONTRACT_ADDRESS, ERC20_MINIMAL_ABI, administrationSignerWallet);
-        console.log(`🔒 Vault Ready: Live Production Mode Active.`);
+        console.log(`🔒 Vault Ready: Live Production Mode Active. Signer: ${administrationSignerWallet.address}`);
     } else {
         console.warn(`⚠️ Warning: Private key unconfigured. Running in zero-crash simulation mode.`);
     }
