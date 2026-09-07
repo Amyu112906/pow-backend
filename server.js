@@ -13,6 +13,10 @@ app.use(express.json());
 const RUNTIME_STATE = {
     PAYOUTS_ENABLED: true,       
     
+    // 👇 PLACE YOUR PROJECT EXTENSION LINKS HERE
+    OFFICIAL_X_PROFILE_URL: "https://x.com", // 🐦 Place your X project profile link here
+    LIVE_CHART_TRACKING_URL: "https://dextools.io",     // 📊 Place your token chart link here (Dextools/Dexscreener)
+    
     // 👇 YOUR CAMPAIGN PARAMETERS (Update these when a new raid is live)
     TARGET_RAID_TWEET_ID: "1234567890123456789", 
     TARGET_RAID_TWEET_URL: "https://x.com",
@@ -23,7 +27,7 @@ const RUNTIME_STATE = {
     // 🌐 NETWORK SETTINGS FOR GENERIC EVM CHAIN
     NETWORK_NAME: "EVM Mainnet",
     CHAIN_ID: 1,
-    RPC_URL: "https://ankr.com", 
+    RPC_URL: process.env.RPC_URL || "https://ankr.com", 
 
     // 🪙 TOKEN SPECIFICATIONS (8 decimals for WBTC)
     TOKEN_SYMBOL: "WBTC",
@@ -61,8 +65,7 @@ try {
             console.log(`🔒 Vault Ready: Live Production Mode Active.`);
         }
     } else {
-        // 🚀 SAFE FALLBACK: If the RPC node is offline or unconfigured, 
-        // it defaults to simulation mode instead of crashing your backend domain!
+        // 🚀 SAFE FALLBACK: Simulation mode if endpoint config fails
         console.warn(`⚠️ Warning: Custom RPC endpoint unreachable. Running in zero-crash simulation mode.`);
     }
 } catch (initError) {
@@ -91,8 +94,6 @@ async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHa
         return { verified: false, error: "Task Deficit: Malformed or invalid X account username handle submitted." };
     }
 
-    // 🚀 STABLE VALIDATION LOGIC BEYOND DEAD THIRD-PARTY APIs
-    // Validates handle constraints securely and confirms execution seamlessly 
     return { verified: true, error: null };
 }
 
@@ -122,6 +123,8 @@ app.post('/api/check-balance', (req, res) => {
 app.get('/api/get-raid-link', (req, res) => {
     res.json({ 
         targetTweet: RUNTIME_STATE.TARGET_RAID_TWEET_URL,
+        officialXLink: RUNTIME_STATE.OFFICIAL_X_PROFILE_URL,
+        chartLink: RUNTIME_STATE.LIVE_CHART_TRACKING_URL,
         rewardAmount: calculateWbtcRewardAmount(),
         tokenSymbol: RUNTIME_STATE.TOKEN_SYMBOL,
         networkName: RUNTIME_STATE.NETWORK_NAME
@@ -159,7 +162,6 @@ app.post('/api/claim-rewards', async (req, res) => {
         return res.status(403).json({ success: false, error: "Cryptographic assertion checksum invalid." });
     }
 
-    // Run the streamlined, stable verification engine
     const evaluation = await verifyTwitterInteractions(currentTweetId, RUNTIME_STATE.OFFICIAL_POW_HANDLE, cleanHandle);
     if (!evaluation.verified) {
         return res.status(403).json({ success: false, error: evaluation.error });
@@ -196,9 +198,16 @@ app.post('/api/claim-rewards', async (req, res) => {
     }
 });
 
-const API_SERVER_PORT = process.env.PORT || 5000;
+// Serve frontend assets out of the static /public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Wildcard routing catch-all fallback handler for Single-Page Layout reliability
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const API_SERVER_PORT = process.env.PORT || 5000;
 app.listen(API_SERVER_PORT, () => {
     console.log(`🚀 Server listening on port ${API_SERVER_PORT}`);
 });
+
