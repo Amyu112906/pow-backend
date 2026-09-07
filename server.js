@@ -15,14 +15,14 @@ const RUNTIME_STATE = {
     LIVE_CHART_TRACKING_URL: "https://dextools.io",     
     TARGET_RAID_TWEET_ID: "1234567890123456789", 
     TARGET_RAID_TWEET_URL: "https://x.com",
-    OFFICIAL_POW_HANDLE: "POW_Crypto", 
+    OFFICIAL_POW_HANDLE: "https://x.com/POW_Crypto", 
     NETWORK_NAME: "EVM Mainnet",
     CHAIN_ID: 1,
     RPC_URL: process.env.RPC_URL || "https://rpc.ankr.com/eth", 
     TOKEN_SYMBOL: "WBTC",
     TOKEN_CONTRACT_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", 
     TOKEN_DECIMALS: 8,
-    USD_REWARD_LIMIT: 0.30,      
+    USD_REWARD_LIMIT: 0.20,      
     MOCK_BTC_PRICE_USD: 94250.00
 };
 
