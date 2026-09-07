@@ -11,14 +11,14 @@ app.use(express.json());
 
 const RUNTIME_STATE = {
     PAYOUTS_ENABLED: true,       
-    OFFICIAL_X_PROFILE_URL: "https://x.com", 
+    OFFICIAL_X_PROFILE_URL: "https://x.com/POW_Crypto", 
     LIVE_CHART_TRACKING_URL: "https://dextools.io",     
     TARGET_RAID_TWEET_ID: "1234567890123456789", 
     TARGET_RAID_TWEET_URL: "https://x.com",
     OFFICIAL_POW_HANDLE: "POW_Crypto", 
     NETWORK_NAME: "EVM Mainnet",
     CHAIN_ID: 1,
-    RPC_URL: process.env.RPC_URL || "https://ankr.com", 
+    RPC_URL: process.env.RPC_URL || "https://rpc.ankr.com/eth", 
     TOKEN_SYMBOL: "WBTC",
     TOKEN_CONTRACT_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", 
     TOKEN_DECIMALS: 8,
@@ -151,7 +151,7 @@ app.post('/api/claim-rewards', async (req, res) => {
         taskClaimHistorySet.add(normalizedAddress);
         const baselinePrevious = userPayoutDatabase.get(normalizedAddress) || 0;
         userPayoutDatabase.set(normalizedAddress, baselinePrevious + parseFloat(finalCalculatedPayout));
-        writeToLedger(`SUCCESS | Wallet: ${walletAddress} | Handle: @${cleanHandle} | Amount: ${finalCalculatedPayout} WBTC | Tx: ${transactionHash}`);
+        writeToLedger(`SUCCESS | Wallet: \${walletAddress} | Handle: @\${cleanHandle} | Amount: \${finalCalculatedPayout} WBTC | Tx: \${transactionHash}`);
         return res.json({
             success: true,
             amount: finalCalculatedPayout,
@@ -171,6 +171,5 @@ app.get('*', (req, res) => {
 
 const API_SERVER_PORT = process.env.PORT || 5000;
 app.listen(API_SERVER_PORT, () => {
-    console.log(`🚀 Server listening on port ${API_SERVER_PORT}`);
+    console.log(`🚀 Server listening on port \${API_SERVER_PORT}`);
 });
-
