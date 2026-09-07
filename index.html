@@ -6,11 +6,11 @@
     <title>POW Automation Control Terminal</title>
     <style>
         :root {
-            /* 🟢 ROBINHOOD SIGNATURE BRAND COLOR THEME */
+            /* 🟢 GENERIC CYBERPUNK TECH BRAND COLOR THEME */
             --bg-color: #04080f;          
             --card-bg: #0b121f;           
-            --accent: #00c805;            
-            --accent-glow: rgba(0, 200, 5, 0.2); 
+            --accent: #00e5ff;            
+            --accent-glow: rgba(0, 229, 255, 0.2); 
             --text-main: #ffffff;         
             --text-muted: #8a99a8;        
             --success: #00e676;           
@@ -26,7 +26,7 @@
         .tabs-nav { display: flex; flex-wrap: wrap; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; gap: 0.25rem; }
         .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 0.75rem 1rem; font-size: 0.85rem; font-weight: 700; cursor: pointer; border-radius: 6px 6px 0 0; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
         .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
-        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(0, 200, 5, 0.05); }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(0, 229, 255, 0.05); }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -52,17 +52,6 @@
         .stat-card { background: #03060c; border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 8px; text-align: left; }
         .stat-card .val { font-size: 1.3rem; font-weight: bold; color: #fff; font-family: monospace; margin-top: 0.25rem; }
 
-        .portal-link-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(0, 200, 5, 0.03); border: 1px solid var(--accent); color: var(--accent); padding: 0.75rem 1.2rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; margin-bottom: 1rem; width: 100%; text-align: center; }
-        .portal-link-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent-glow); }
-
-        .roadmap-timeline { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
-        .roadmap-node { background: #03060c; border-left: 3px solid var(--accent); padding: 1rem; border-radius: 0 8px 8px 0; text-align: left; }
-        .roadmap-node.done { border-left-color: var(--success); }
-        .roadmap-node h3 { font-size: 1.05rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; }
-        .roadmap-node h3 span { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: rgba(0, 200, 5, 0.1); color: var(--accent); }
-        .roadmap-node.done h3 span { background: rgba(0, 230, 118, 0.1); color: var(--success); }
-        .roadmap-node p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
-
         .progress-track { width: 100%; background: #1a2638; height: 8px; border-radius: 4px; margin-top: 1.5rem; display: none; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.1s linear; }
         .status-banner { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: left; }
@@ -76,10 +65,10 @@
         <h1>POW <span>Terminal</span></h1>
         <p class="intro-text">Automation and Analytics Dashboard Suite</p>
         
+        <!-- 📑 TWO-TAB NAVIGATION HIERARCHY -->
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchTab('rewards-tab', this)">💎 Rewards Center</button>
             <button class="tab-btn" onclick="switchTab('roadmap-tab', this)">🗺️ Road Map</button>
-            <button class="tab-btn" onclick="switchTab('twitter-tab', this)">🐦 Robinhood Updates</button>
         </div>
 
         <!-- 💎 TAB 1: REWARDS CENTER -->
@@ -87,13 +76,13 @@
             <div class="input-group">
                 <label for="twitter-proof"><span>Step 1:</span> Input Your Public X Handle Name</label>
                 <div class="sub-label-link">
-                    👉 <a href="https://x.com" id="raid-link" target="_blank">https://x.com/POW_Crypto/status/2096562867428372849?s=20</a> Like, Retweet, and Follow <b>https://x.com/POW_Crypto</b>.
+                    👉 <a href="https://x.com" id="raid-link" target="_blank">CLICK HERE TO OPEN TWEET</a> Like, Retweet, and Follow <b>@POW_Crypto</b>.
                 </div>
                 <input type="text" id="twitter-proof" class="address-input" placeholder="Enter your username (e.g. @CryptoWorker)" autocomplete="off">
             </div>
 
             <div class="input-group">
-                <label for="address"><span>Step 2:</span> Robinhood Chain Recipient Address</label>
+                <label for="address"><span>Step 2:</span> EVM Target Recipient Address</label>
                 <input type="text" id="address" class="address-input" placeholder="0x..." autocomplete="off">
             </div>
 
@@ -107,58 +96,40 @@
                     <label>Account Lifetime Payout</label>
                     <div id="reward-stat-lifetime" class="val">0.00000000 WBTC</div>
                 </div>
-                <div class="stat-card">
-                    <label>Anti-Spam Lockout status</label>
-                    <button style="background:transparent; border:none; color:var(--accent); float:right; font-size:0.75rem; cursor:pointer;" onclick="fetchWorkerAccountDetails()">[REFRESH]</button>
-                    <div id="reward-stat-cooldown" class="val">0 Min Left</div>
-                </div>
             </div>
         </div>
 
         <!-- 🗺️ TAB 2: ROAD MAP -->
         <div id="roadmap-tab" class="tab-content">
-            <p class="intro-text">Strategic architecture schedule milestones for the $POW infrastructure ecosystem.</p>
             <div class="roadmap-timeline">
                 <div class="roadmap-node done">
-                    <h3>Phase I: Terminal Launch <span>COMPLETED</span></h3>
-                    <p>Establishment of automation infrastructure interfaces, secure tracking parameters, and core validation node systems.</p>
+                    <h3>Phase 1: Core Architecture <span>Completed</span></h3>
+                    <p>Initialization of computing task ledger pipelines and decentralized infrastructure hooks.</p>
                 </div>
                 <div class="roadmap-node">
-                    <h3>Phase II: Live Smart Contract Binding <span>DEVELOPING</span></h3>
-                    <p>Transition from administrative backup validation networks into direct automated wallet multi-sig deployments execution layers.</p>
-                </div>
-                <div class="roadmap-node">
-                    <h3>Phase III: Multi-Asset Router pools <span>UPCOMING</span></h3>
-                    <p>Integration of expanding allocation target channels across diverse underlying index sets natively on Robinhood Chain.</p>
+                    <h3>Phase 2: Automated Validation <span>In Progress</span></h3>
+                    <p>Refining cross-platform algorithmic checks to secure continuous uptime verification channels.</p>
                 </div>
             </div>
         </div>
+    </div>
 
-                <!-- 🐦 TAB 3: ROBINHOOD TWITTER UPDATE -->
-        <div id="twitter-tab" class="tab-content">
-            <p class="intro-text">Live telemetry updates tracking corporate and architectural information feeds from Robinhood networks.</p>
+    <!-- 🧠 CLIENT-SIDE CONTROLLERS -->
+    <script>
+        function switchTab(tabId, element) {
+            // Deactivate all tab window views
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // Revoke active styling flags across navigation list items
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
             
-            <!-- 🟢 LIVE NETWORK PARAMETERS NOTIFICATION FEED -->
-            <div style="background: #03060c; border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                    <span style="font-size: 0.75rem; color: var(--accent); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">📡 Network Operational Logs</span>
-                    <span style="font-size: 0.70rem; color: var(--text-muted); font-family: monospace;">STATUS: ACTIVE</span>
-                </div>
-                <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6; color: #fff;">
-                    <div style="margin-bottom: 0.25rem;"><span style="color: var(--accent);">[SYS_LOG]:</span> Robinhood Chain mainnet RPC synchronization verified.</div>
-                    <div style="margin-bottom: 0.25rem;"><span style="color: var(--accent);">[SYS_LOG]:</span> Contract binding layer connected to token address 0x5F26...</div>
-                    <div><span style="color: var(--accent);">[SYS_LOG]:</span> Dynamic reward distribution pool locked at $0.30 USD tracking metrics.</div>
-                </div>
-            </div>
-
-            <!-- 🟢 OFFICIAL REDIRECT ACTION CARD -->
-            <div style="background: #090d16; border: 1px solid var(--border-color); border-radius: 8px; padding: 2.5rem; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem;">
-                <div style="font-size: 2rem;">🐦</div>
-                <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 440px; margin: 0 auto; text-align: center; line-height: 1.5;">
-                    To prevent browser security layout blocks, stay synchronized with structural network rollouts directly on our official social channel.
-                </p>
-                <a href="https://x.com" target="_blank" class="portal-link-btn">
-                    🚀 Open Verified Robinhood X Timeline
-                </a>
-            </div>
-        </div>
+            // Set designated elements to visible active states
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
