@@ -9,27 +9,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🎛️ ADMINISTRATIVE CONFIGURATION AND CONTROL SWITCHES
 const RUNTIME_STATE = {
     PAYOUTS_ENABLED: true,       
-    
-    // 👇 PLACE YOUR PROJECT EXTENSION LINKS HERE
-    OFFICIAL_X_PROFILE_URL: "https://x.com", // 🐦 Place your X project profile link here
-    LIVE_CHART_TRACKING_URL: "https://dextools.io",     // 📊 Place your token chart link here (Dextools/Dexscreener)
-    
-    // 👇 YOUR CAMPAIGN PARAMETERS (Update these when a new raid is live)
+    OFFICIAL_X_PROFILE_URL: "https://x.com", 
+    LIVE_CHART_TRACKING_URL: "https://dextools.io",     
     TARGET_RAID_TWEET_ID: "1234567890123456789", 
     TARGET_RAID_TWEET_URL: "https://x.com",
-    
-    // 🏷️ OFFICIAL ACCOUNT TO FOLLOW
     OFFICIAL_POW_HANDLE: "POW_Crypto", 
-
-    // 🌐 NETWORK SETTINGS FOR GENERIC EVM CHAIN
     NETWORK_NAME: "EVM Mainnet",
     CHAIN_ID: 1,
     RPC_URL: process.env.RPC_URL || "https://ankr.com", 
-
-    // 🪙 TOKEN SPECIFICATIONS (8 decimals for WBTC)
     TOKEN_SYMBOL: "WBTC",
     TOKEN_CONTRACT_ADDRESS: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", 
     TOKEN_DECIMALS: 8,
@@ -41,7 +30,6 @@ const LEDGER_FILE_PATH = path.join(__dirname, 'payout_ledger.txt');
 const userPayoutDatabase = new Map(); 
 const permanentClaimedTasksRegistry = new Map();
 
-// Connect live network pipeline to EVM Chain node
 let networkProvider;
 let administrationSignerWallet;
 let tokenContract;
@@ -52,7 +40,6 @@ const ERC20_MINIMAL_ABI = [
 ];
 
 try {
-    // 🟢 PRODUCTION COGNIZANCE: Safe network node initialization layer
     if (RUNTIME_STATE.RPC_URL) {
         networkProvider = new ethers.JsonRpcProvider(RUNTIME_STATE.RPC_URL, {
             chainId: RUNTIME_STATE.CHAIN_ID,
@@ -65,11 +52,9 @@ try {
             console.log(`🔒 Vault Ready: Live Production Mode Active.`);
         }
     } else {
-        // 🚀 SAFE FALLBACK: Simulation mode if endpoint config fails
-        console.warn(`⚠️ Warning: Custom RPC endpoint unreachable. Running in zero-crash simulation mode.`);
+        console.warn(`⚠️ Warning: Custom RPC endpoint unreachable. Running in simulation mode.`);
     }
 } catch (initError) {
-    // 🔒 FAIL-SAFE LAYER: Catches any network node drops and forces the server to stay alive
     console.error("Node Handshake Exception Caught safely. Server remains online:", initError.message);
 }
 
@@ -85,15 +70,11 @@ function writeToLedger(logLine) {
     });
 }
 
-// 🌐 PRODUCTION-READY LIGHTWEIGHT ENFORCEMENT ENGINE
 async function verifyTwitterInteractions(targetTweetId, officialHandle, workerHandle) {
     const cleanWorker = workerHandle.replace('@', '').trim().toLowerCase();
-    
-    // Safety check against malicious inputs or blank spaces
     if (cleanWorker.length < 2) {
-        return { verified: false, error: "Task Deficit: Malformed or invalid X account username handle submitted." };
+        return { verified: false, error: "Task Deficit: Malformed username handle." };
     }
-
     return { verified: true, error: null };
 }
 
@@ -102,15 +83,12 @@ app.post('/api/check-balance', (req, res) => {
     if (!walletAddress || !ethers.isAddress(walletAddress)) {
         return res.status(400).json({ success: false, error: "Invalid EVM wallet address." });
     }
-
     const normalizedAddress = walletAddress.toLowerCase();
     const currentTweetId = RUNTIME_STATE.TARGET_RAID_TWEET_ID;
-    
     let taskAlreadyClaimed = false;
     if (permanentClaimedTasksRegistry.has(currentTweetId)) {
         taskAlreadyClaimed = permanentClaimedTasksRegistry.get(currentTweetId).has(normalizedAddress);
     }
-
     const totalClaimed = userPayoutDatabase.get(normalizedAddress) || 0;
     res.json({
         success: true,
@@ -133,59 +111,47 @@ app.get('/api/get-raid-link', (req, res) => {
 
 app.post('/api/claim-rewards', async (req, res) => {
     const { walletAddress, twitterProof, workToken } = req.body; 
-    
     if (!walletAddress || !twitterProof || !workToken) {
         return res.status(400).json({ success: false, error: "Invalid payload parameters." });
     }
     if (!ethers.isAddress(walletAddress)) {
         return res.status(400).json({ success: false, error: "Malformed wallet structure." });
     }
-
     const normalizedAddress = walletAddress.toLowerCase();
     const currentTweetId = RUNTIME_STATE.TARGET_RAID_TWEET_ID;
     const cleanHandle = twitterProof.trim().replace('@', '');
 
     if (cleanHandle.length < 1 || cleanHandle.includes('/') || cleanHandle.includes(' ')) {
-        return res.status(400).json({ success: false, error: "Input Fault: Provide a clean X account handle username." });
+        return res.status(400).json({ success: false, error: "Input Fault: Provide clean username handle." });
     }
-
     if (!permanentClaimedTasksRegistry.has(currentTweetId)) {
         permanentClaimedTasksRegistry.set(currentTweetId, new Set());
     }
-    
     const taskClaimHistorySet = permanentClaimedTasksRegistry.get(currentTweetId);
     if (taskClaimHistorySet.has(normalizedAddress)) {
-        return res.status(429).json({ success: false, error: "Double-Claim Security Block: Payout was already issued to this wallet for the current work task." });
+        return res.status(429).json({ success: false, error: "Double-Claim Security Block." });
     }
-
     if (workToken !== "VALID_COMPUTATION_TOKEN_HASH_99") {
         return res.status(403).json({ success: false, error: "Cryptographic assertion checksum invalid." });
     }
-
     const evaluation = await verifyTwitterInteractions(currentTweetId, RUNTIME_STATE.OFFICIAL_POW_HANDLE, cleanHandle);
-    if (!evaluation.verified) {
-        return res.status(403).json({ success: false, error: evaluation.error });
-    }
+    if (!evaluation.verified) return res.status(403).json({ success: false, error: evaluation.error });
 
     try {
         const finalCalculatedPayout = calculateWbtcRewardAmount();
         let transactionHash = "";
-
         if (administrationSignerWallet && tokenContract) {
             const rawTokenSubunits = ethers.parseUnits(finalCalculatedPayout, RUNTIME_STATE.TOKEN_DECIMALS);
             const txResponse = await tokenContract.transfer(walletAddress, rawTokenSubunits);
             const txReceipt = await txResponse.wait(1);
             transactionHash = txReceipt.hash;
         } else {
-            transactionHash = "0xMainnetTx_" + Math.random().toString(16).substr(2, 32);
+            transactionHash = "0xMainnetTx_" + Math.random().toString(16).substring(2, 34);
         }
-
         taskClaimHistorySet.add(normalizedAddress);
         const baselinePrevious = userPayoutDatabase.get(normalizedAddress) || 0;
         userPayoutDatabase.set(normalizedAddress, baselinePrevious + parseFloat(finalCalculatedPayout));
-
-        writeToLedger(`SUCCESS | Wallet: ${walletAddress} | Handle: @${cleanHandle} | TweetID: ${currentTweetId} | Amount: ${finalCalculatedPayout} WBTC | Tx: ${transactionHash}`);
-
+        writeToLedger(`SUCCESS | Wallet: ${walletAddress} | Handle: @${cleanHandle} | Amount: ${finalCalculatedPayout} WBTC | Tx: ${transactionHash}`);
         return res.json({
             success: true,
             amount: finalCalculatedPayout,
@@ -198,10 +164,7 @@ app.post('/api/claim-rewards', async (req, res) => {
     }
 });
 
-// Serve frontend assets out of the static /public folder
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Wildcard routing catch-all fallback handler for Single-Page Layout reliability
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
