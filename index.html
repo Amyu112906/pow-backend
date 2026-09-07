@@ -6,53 +6,53 @@
     <title>POW Automation Control Terminal</title>
     <style>
         :root {
-            --bg-color: #04080f;          
-            --card-bg: #0b121f;           
-            --accent: #00e5ff;            
-            --accent-glow: rgba(0, 229, 255, 0.2); 
+            /* 🟢 AUTHENTIC ROBINHOOD SIGNATURE DARK MODE PALETTE */
+            --bg-color: #000000;          
+            --card-bg: #1e222d;           
+            --accent: #00c805;            
+            --accent-glow: rgba(0, 200, 5, 0.15); 
             --text-main: #ffffff;         
-            --text-muted: #8a99a8;        
-            --success: #00e676;           
-            --error: #f43f5e;             
-            --border-color: #1a2638;      
+            --text-muted: #9aa0a6;        
+            --success: #00c805;           
+            --error: #ff3b30;             
+            --border-color: #2a2e39;      
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
         
-        .terminal-box { background: var(--card-bg); width: 100%; max-width: 680px; padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; }
-        .terminal-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+        .terminal-box { background: var(--card-bg); width: 100%; max-width: 680px; padding: 2.5rem 2rem; border-radius: 24px; border: 1px solid var(--border-color); box-shadow: 0 25px 50px rgba(0,0,0,0.8); position: relative; }
         
-        /* 🔗 EXTERNAL LINKS HEADER COMPONENT */
-        .project-links { display: flex; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
-        .lnk-btn { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
-        .lnk-btn:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent-glow); }
+        .project-links { display: flex; gap: 1.25rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); }
+        .lnk-btn { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
+        .lnk-btn:hover { color: var(--accent); }
 
-        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.25rem; }
-        h1 span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
-        p.intro-text { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+        h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.5px; }
+        h1 span { color: var(--accent); }
+        p.intro-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem; }
         
-        .input-group { margin-bottom: 1.25rem; text-align: left; }
-        label { display: block; margin-bottom: 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .input-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
         label span { color: var(--accent); }
-        .sub-label-link { margin: 2px 0 10px 0; font-size: 0.85rem; color: var(--text-muted); }
-        .sub-label-link a { color: var(--accent); text-decoration: underline; font-weight: 600; }
+        .sub-label-link { margin: 4px 0 12px 0; font-size: 0.85rem; color: var(--text-muted); }
+        .sub-label-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .sub-label-link a:hover { text-decoration: underline; }
         
-        .address-input { width: 100%; background: #03060c; border: 1px solid #1a2b3c; padding: 1rem; border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none; transition: 0.3s; font-family: monospace; }
-        .address-input:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+        .address-input { width: 100%; background: #131722; border: 1px solid var(--border-color); padding: 1.1rem; border-radius: 12px; color: #fff; font-size: 1rem; outline: none; transition: 0.2s; font-family: monospace; }
+        .address-input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
         
-        .cta-btn { background: var(--accent); color: #000; border: none; padding: 1rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; display: block; text-align: center; text-decoration: none; }
-        .cta-btn:hover { background: #1eff24; box-shadow: 0 0 20px var(--accent-glow); }
-        .cta-btn:disabled { background: #1a2638; color: #526375; cursor: not-allowed; box-shadow: none; }
+        .cta-btn { background: var(--accent); color: #000000; border: none; padding: 1.1rem; font-size: 1rem; font-weight: 700; border-radius: 28px; cursor: pointer; width: 100%; transition: 0.2s; display: block; text-align: center; text-decoration: none; }
+        .cta-btn:hover { background: #00e606; transform: scale(1.01); }
+        .cta-btn:disabled { background: #2a2e39; color: #5f656e; cursor: not-allowed; transform: none; }
         
         .market-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; }
-        .stat-card { background: #03060c; border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 8px; text-align: left; }
-        .stat-card .val { font-size: 1.3rem; font-weight: bold; color: #fff; font-family: monospace; margin-top: 0.25rem; }
+        .stat-card { background: #131722; border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 12px; text-align: left; }
+        .stat-card .val { font-size: 1.4rem; font-weight: 600; color: #fff; font-family: monospace; margin-top: 0.25rem; }
 
-        .progress-track { width: 100%; background: #1a2638; height: 8px; border-radius: 4px; margin-top: 1.5rem; display: none; overflow: hidden; }
+        .progress-track { width: 100%; background: #2a2e39; height: 6px; border-radius: 3px; margin-top: 1.5rem; display: none; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.1s linear; }
-        .status-banner { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; text-align: left; border: 1px solid; }
-        .status-banner.success { background: rgba(0, 230, 118, 0.05); border-color: rgba(0, 230, 118, 0.2); color: var(--success); }
-        .status-banner.error { background: rgba(244, 63, 94, 0.05); border-color: rgba(244, 63, 94, 0.2); color: var(--error); }
+        .status-banner { margin-top: 1.5rem; padding: 1.1rem; border-radius: 12px; font-weight: 600; font-size: 0.95rem; display: none; text-align: left; border: 1px solid; }
+        .status-banner.success { background: rgba(0, 200, 5, 0.05); border-color: rgba(0, 200, 5, 0.2); color: var(--success); }
+        .status-banner.error { background: rgba(255, 59, 48, 0.05); border-color: rgba(255, 59, 48, 0.2); color: var(--error); }
     </style>
 </head>
 <body>
@@ -61,13 +61,11 @@
         <h1>POW <span>Terminal</span></h1>
         <p class="intro-text">Automation and Analytics Dashboard Suite</p>
         
-        <!-- 🔗 DYNAMIC LINKS (Update targets directly via the backend server file) -->
         <div class="project-links">
             <a href="https://x.com" id="nav-x-link" target="_blank" class="lnk-btn">🐦 X Profile</a>
             <a href="https://dextools.io" id="nav-chart-link" target="_blank" class="lnk-btn">📊 Live Chart</a>
         </div>
 
-        <!-- 💎 MAIN REWARDS PANEL -->
         <div class="input-group">
             <label for="twitter-proof"><span>Step 1:</span> Input Your Public X Handle Name</label>
             <div class="sub-label-link">
@@ -85,7 +83,7 @@
         <div class="progress-track" id="progress-container"><div class="progress-fill" id="progress-bar"></div></div>
         <div id="status-display" class="status-banner"></div>
 
-        <h2 style="font-size:1.1rem; margin-top:2rem; margin-bottom:0.5rem; text-align:left;">Check Account Profile Stats</h2>
+        <h2 style="font-size:1.1rem; margin-top:2rem; margin-bottom:0.5rem; text-align:left; font-weight: 600;">Check Account Profile Stats</h2>
         <div class="market-grid" style="margin-top:0;">
             <div class="stat-card">
                 <label>Account Lifetime Payout</label>
@@ -107,7 +105,6 @@
         const navXLink = document.getElementById('nav-x-link');
         const navChartLink = document.getElementById('nav-chart-link');
 
-        // Sync visual links with active campaign variables from server backend
         async function loadCampaignDetails() {
             try {
                 const response = await fetch('/api/get-raid-link');
@@ -116,7 +113,7 @@
                 if (data.officialXLink) navXLink.href = data.officialXLink;
                 if (data.chartLink) navChartLink.href = data.chartLink;
             } catch (err) {
-                console.error("Failed to load ecosystem link configuration nodes:", err);
+                console.error("Failed to load runtime configurations:", err);
             }
         }
 
@@ -174,4 +171,12 @@
                         walletAddress: addressInput.value.trim(),
                         twitterProof: twitterInput.value.trim(),
                         workToken: "VALID_COMPUTATION_TOKEN_HASH_99"
+                    })
+                });
+                
+                const data = await response.json();
+                progressContainer.style.display = 'none';
+                statusDisplay.style.display = 'block';
 
+                if (data.success) {
+                    statusDisplay.className = "status-banner success";
